@@ -58,6 +58,7 @@ try:
         testTriggers[0].conditions[0].area_x2) + ", y1 = " + str(
         testTriggers[0].conditions[0].area_y1) + ", y2 = " + str(testTriggers[0].conditions[0].area_y2) + "]")
     print("map size: " + str(testTriggers[0].conditions[1].area_x2))
+    print("teleSheep location: [x=" + str(testTriggers[0].effects[0].location_x) + ", y=" + str(testTriggers[0].effects[0].location_y) + "]")
 
 except:
     print("This is not the map!")

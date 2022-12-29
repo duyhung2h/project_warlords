@@ -1,4 +1,5 @@
 from AoE2ScenarioParser.datasets.trigger_lists import *
+from AoE2ScenarioParser.datasets.units import UnitInfo
 from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
 
 from functions.RebuildingTriggers import RebuildingTriggers
@@ -66,12 +67,73 @@ for unit in P1to6_units:
                 create_garri_trigg.new_effect.create_garrisoned_object(
                     source_player=0,
                     object_list_unit_id=buildingInfo.ID,
-                    object_list_unit_id_2=206,
+                    object_list_unit_id_2=UnitInfo.VMDL.ID,
                     selected_object_ids=unit.reference_id
                 )
             create_garri_trigg.new_effect.none()
 
-# GAIA_buil
+# Now we teleport the sheep away to count GAIA razing for each players
+print("===TeleportAndCountRazing" + str(playerId) + "=============================================")
+for playerId in range(1, 9, 1):
+    # Add triggers for garrison CAP
+    sheep_tele_trigg = source_trigger_manager.add_trigger(name="P" + str(playerId) + "_TeleSheep", looping=True,
+                                                          enabled=True)
+    sheep_tele_trigg.new_condition.own_objects(
+        source_player=playerId,
+        object_list=UnitInfo.SHEEP.ID,
+        quantity=1
+    )
+    sheep_tele_trigg.new_effect.teleport_object(
+        source_player=playerId,
+        object_list_unit_id=UnitInfo.SHEEP.ID,
+        location_x=249,
+        location_y=1
+    )
+    count_raz_trigg = source_trigger_manager.add_trigger(name="P" + str(playerId) + "_CountSheepRz", looping=True,
+                                                         enabled=True)
+    count_raz_trigg.new_condition.objects_in_area(
+        quantity=1,
+        source_player=playerId,
+        object_list=UnitInfo.SHEEP.ID,
+        object_state=ObjectState.ALIVE,
+        area_x1=248,
+        area_x2=250,
+        area_y1=0,
+        area_y2=2
+    )
+    count_raz_trigg.new_effect.remove_object(
+        source_player=playerId,
+        object_list_unit_id=UnitInfo.SHEEP.ID,
+        area_x1=248,
+        area_x2=250,
+        area_y1=0,
+        area_y2=2,
+        object_state=ObjectState.ALIVE,
+    )
+    count_raz_trigg.new_effect.tribute(
+        quantity=-15,
+        source_player=playerId,
+        target_player=0,
+        tribute_list=Attribute.WOOD_STORAGE
+    )
+    count_raz_trigg.new_effect.tribute(
+        quantity=-10,
+        source_player=playerId,
+        target_player=0,
+        tribute_list=Attribute.GOLD_STORAGE
+    )
+    count_raz_trigg.new_effect.tribute(
+        quantity=-10,
+        source_player=playerId,
+        target_player=0,
+        tribute_list=Attribute.STONE_STORAGE
+    )
+    count_raz_trigg.new_effect.tribute(
+        quantity=-15,
+        source_player=playerId,
+        target_player=0,
+        tribute_list=Attribute.FOOD_STORAGE
+    )
 
 # Add triggers for Garrisoning in
 # for x in range(1, map_size, 1):
