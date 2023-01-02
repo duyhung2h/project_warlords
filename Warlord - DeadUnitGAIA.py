@@ -9,7 +9,7 @@ from model.buildings import BuildingInfo
 scenario_folder = "C:/Users/Admin/Games/Age of Empires 2 DE/76561198148041091/resources/_common/scenario/"
 
 # Source scenario to work with
-scenario_name = "12warlords 0v1v3"
+scenario_name = "12warlords 0v1v9"
 input_path = scenario_folder + scenario_name + ".aoe2scenario"
 output_path = scenario_folder + scenario_name + " modify GAIA" + ".aoe2scenario"
 
@@ -47,7 +47,9 @@ for playerId in range(1, 9, 1):
                                                        object_list_unit_id=building.ID,
                                                        object_attributes=ObjectAttribute.GARRISON_CAPACITY)
 
-# Get all GAIA unit
+'''
+Get all GAIA unit
+'''
 P1to6_units = source_scenario.unit_manager.get_player_units(player=1) + source_scenario.unit_manager.get_player_units(
     player=2) + source_scenario.unit_manager.get_player_units(player=3) + source_scenario.unit_manager.get_player_units(
     player=4) + source_scenario.unit_manager.get_player_units(player=5) + source_scenario.unit_manager.get_player_units(
@@ -55,7 +57,9 @@ P1to6_units = source_scenario.unit_manager.get_player_units(player=1) + source_s
 GAIA_building = []
 print(BuildingInfo.non_gaia())
 
-# Add triggers for Garrisoning in
+'''
+Add triggers for Garrisoning in
+'''
 create_garri_trigg = source_trigger_manager.add_trigger("GAIA_GAR_CREATE")
 create_garri_trigg.new_condition.timer(timer=11)
 for unit in P1to6_units:
@@ -72,7 +76,9 @@ for unit in P1to6_units:
                 )
             create_garri_trigg.new_effect.none()
 
-# Now we teleport the sheep away to count GAIA razing for each players
+'''
+Now we teleport the sheep away to count GAIA razing for each players
+'''
 print("===TeleportAndCountRazing" + str(playerId) + "=============================================")
 for playerId in range(1, 9, 1):
     # Add triggers for garrison CAP

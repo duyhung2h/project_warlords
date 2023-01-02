@@ -4,7 +4,7 @@ from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
 scenario_folder = "C:/Users/Admin/Games/Age of Empires 2 DE/76561198148041091/resources/_common/scenario/"
 
 # Source scenario to work with
-scenario_name = "12warlords 0v1v3"
+scenario_name = "12warlords 0v1v9"
 input_path = scenario_folder + scenario_name + ".aoe2scenario"
 
 # declare scenario class
@@ -58,9 +58,22 @@ try:
         testTriggers[0].conditions[0].area_x2) + ", y1 = " + str(
         testTriggers[0].conditions[0].area_y1) + ", y2 = " + str(testTriggers[0].conditions[0].area_y2) + "]")
     print("map size: " + str(testTriggers[0].conditions[1].area_x2))
-    print("teleSheep location: [x=" + str(testTriggers[0].effects[0].location_x) + ", y=" + str(testTriggers[0].effects[0].location_y) + "]")
+    print("location Bắc Kạn [x1 = " + str(testTriggers[0].conditions[2].area_x1) + ", x2 = " + str(
+        testTriggers[0].conditions[2].area_x2) + ", y1 = " + str(
+        testTriggers[0].conditions[2].area_y1) + ", y2 = " + str(testTriggers[0].conditions[2].area_y2) + "]")
+    print("location Đại La [x1 = " + str(testTriggers[0].conditions[3].area_x1) + ", x2 = " + str(
+        testTriggers[0].conditions[3].area_x2) + ", y1 = " + str(
+        testTriggers[0].conditions[3].area_y1) + ", y2 = " + str(testTriggers[0].conditions[3].area_y2) + "]")
+    print("teleSheep location: [x=" + str(testTriggers[0].effects[0].location_x) + ", y=" + str(
+        testTriggers[0].effects[0].location_y) + "]")
+    print("------------CheckTCLocation--------------")
+    print("TC Dai La location: [x=" + str(testTriggers[1].effects[0].location_x) + ", y=" + str(
+        testTriggers[1].effects[0].location_y) + "]")
+    print("TC Tuyên Quang location: [x=" + str(testTriggers[1].effects[1].location_x) + ", y=" + str(
+        testTriggers[1].effects[1].location_y) + "]")
+    print("TC Bắc Kạn location: [x=" + str(testTriggers[1].effects[2].location_x) + ", y=" + str(
+        testTriggers[1].effects[2].location_y) + "]")
+
 
 except:
     print("This is not the map!")
-
-

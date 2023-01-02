@@ -3,8 +3,8 @@ class RebuildingTriggers:
 
     def rebuild_trigger(self, source_trigger_manager, identification_name):
         # remove past triggers
-        triggerStart = 0
-        triggerEnd = 0
+        triggerStart = -1
+        triggerEnd = -1
         triggerDisplayList = source_trigger_manager.trigger_display_order
         for triggerId in range(0, len(triggerDisplayList), 1):
             if source_trigger_manager.triggers[

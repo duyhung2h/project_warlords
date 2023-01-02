@@ -1,0 +1,59 @@
+P2 (Đinh Bộ Lĩnh) established a tribal kingdom in the grand cave of Hoa Lư. It is fortified to hold against rivaling warlords, but he must unite all different sects in his realm together.
+
+P3 (Ngô Xương Văn) is what left of the Ngô Dynasty. Now severely weakened, he must retreat back to southern provinces and build back his forces which were separated by the insurgency.
+
+[P1-6] After establishing your first capital, you are able to contact different insurgents to establish alliances, and call them to your side. They are the following:
+
+Ngô Nhật Khánh (Ngô Quyền's nephew, situated in... . Skills are listed in the {Scout} section.)
+
+---------Hero's Skills----------
+Ngô Nhật Khánh
+- Excellent Scheme: Reveal enemy's line of sight for 10 seconds. Cooldown 5 minutes.
+---------Province's Specialty-------------
+Hoa Lư
+Superior Archery:
+
+Click this icon to appease this village. You'd need to fulfill any request this settlement may have, to earn their trust and pull them to your side. Each warlord can only have up to 3 villages.
+
+
+
+
+
+"And so, as the central government is now delicate as ever,
+Warlords all across Annam are establishing themselves new factions against the central government, holds by the Ngo brothers.
+
+ Can the central government defend against this inevitable threat, or succumb to the warchiefs?
+"
+
+"A new era of Vietnamese history was born."
+"===ANARCHY OF 12 WARLORDS==="
+""
+-------Gameplay
+
+in the first 10 minutes, Ngo Brothers (P1) are allied to every warlords (P2-6).
+
+P1-6 (The Warlords, counting Ngo): Thy are able to approach surrounding villages, and the central village TC will reveal itself.
+Pick an option inside the TC to appease, or defy the village. Each player can only appease 3 villages maximum.
+
+P1 (Ngo Brothers) Objetive: Pacify the warlords!!!
+After the first 10 minutes of peace, the Ngo brothers can change diplomacy with the surrounding warlord players,
+If the rest of warlords are either defeated, or allied, if the alliance is maintained for more than 10 minutes,
+Thy will achieve allied victory.
+(AV is only possible if there're <3 warlords left (counting P1) in the map.)
+
+P2-6 (Warlords) Objective: Topple the central government!
+Thy will gain victory by capturing the central Fortress for 15 minutes.
+A notification will appear for all warlords when the [Regency] Global Quest has been initiated by a warlord player.
+After taking the quest, the warlord will wage war upon the Ngos, and the central TC will be targetable.
+
+Or thy will gain victory by staying loyal to the Ngo, the choice is yours.
+(AV is only possible if there're <3 warlords left (counting P1) in the map.)
+
+P7 Objective (Tai peoples): WIP
+
+
+
+////////////other features
+
+Every warlords can have maximum of 3 villages (TC). You could build more, but you're limited on the TC you got
+(each TC gains you pop limit and unlock powerful abilities)
