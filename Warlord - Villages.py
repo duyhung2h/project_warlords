@@ -13,7 +13,7 @@ from model.village_enum import VillageInfo
 scenario_folder = "C:/Users/Admin/Games/Age of Empires 2 DE/76561198148041091/resources/_common/scenario/"
 
 # Source scenario to work with
-scenario_name = "12warlords 0v1v9"
+scenario_name = "12warlords 0v1v10"
 input_path = scenario_folder + scenario_name + ".aoe2scenario"
 output_path = scenario_folder + scenario_name + " Adding Villages" + ".aoe2scenario"
 
@@ -103,6 +103,15 @@ for village in Villages.get_villages():
             area_y2=village.TClocation[1],
             object_list_unit_id=1689,
         )
+        trigg_unit_outof_village.new_effect.change_ownership(
+            source_player=playerId,
+            target_player=0,
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3],
+            object_list_unit_id=BuildingInfo.HARBOR.ID
+        )
         # print(village.villageName)
         # print(VillageInfo[village.typeOfMission].REQ_TEXT)
 
@@ -129,6 +138,10 @@ for village in Villages.get_villages():
             area_y2=village.locationXY[3],
             object_state=ObjectState.ALIVE,
             object_type=ObjectType.MILITARY
+        )
+        trigg_near_village_change_ow_loop.new_condition.object_selected_multiplayer(
+            source_player=playerId,
+            unit_object=village.coreTC
         )
         trigg_near_village_change_ow_loop.new_condition.objects_in_area(
             quantity=1,

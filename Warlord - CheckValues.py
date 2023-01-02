@@ -73,6 +73,9 @@ try:
         testTriggers[1].effects[1].location_y) + "]")
     print("TC Bắc Kạn location: [x=" + str(testTriggers[1].effects[2].location_x) + ", y=" + str(
         testTriggers[1].effects[2].location_y) + "]")
+    print("TC Dai La Coreunit: " + str(testTriggers[1].effects[0].selected_object_ids))
+    print("TC Tuyên Quang Coreunit: " + str(testTriggers[1].effects[1].selected_object_ids))
+    print("TC Bắc Kạn Coreunit: " + str(testTriggers[1].effects[2].selected_object_ids))
 
 
 except:

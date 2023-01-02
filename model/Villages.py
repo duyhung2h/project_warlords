@@ -11,18 +11,19 @@ class Villages:
     win the village's favor (by doing their errands)
     """
 
-    def __init__(self, villageName, locationXY, typeOfMission, TClocation):
+    def __init__(self, villageName, locationXY, typeOfMission, TClocation, coreTC):
         self.villageName = villageName
         self.locationXY = locationXY
         self.typeOfMission = typeOfMission
         self.TClocation = TClocation
+        self.coreTC = coreTC
 
     def get_villages():
         return [
-            Villages('Tuyên Quang', [97, 131, 85, 118], 'ARMS_RACE', [117, 105]),
-            Villages('Bắc Kạn', [160, 189, 126, 153], 'GATHERING', [172, 141]),
-            Villages('Đại La', [82, 104, 147, 174], 'REGENCY', [97, 155]),
-            Villages('Hoa Lư 1', [0, 0, 0, 0], 'TRIBAL_FEUD', [0, 0]),
+            Villages('Tuyên Quang', [97, 131, 85, 118], 'ARMS_RACE', [117, 105], 28610),
+            Villages('Bắc Kạn', [160, 189, 126, 153], 'GATHERING', [172, 141], 21166),
+            Villages('Đại La', [82, 104, 147, 174], 'REGENCY', [97, 155], 17204),
+            Villages('Hoa Lư 1', [0, 0, 0, 0], 'TRIBAL_FEUD', [0, 0], 1),
         ]
 
     '''
