@@ -41,7 +41,7 @@ class VillageDatasetBase(Enum):
         return self._get_property('req_text')
 
     @property
-    def THREAT_TEXT(self) -> str:
+    def THREAT_TEXT(self) -> []:
         """
         Returns:
             The ID of the specified unit
@@ -67,21 +67,21 @@ class VillageInfo(VillageDatasetBase):
             "rather than having enough men to protect those folks.",
             "My lord, our realm would be pleased if we receive protection from thy men."
         ], \
-        "Take these supplies and leave! Spare our women and children!"
+        ["There will be places for scumbags like thee in hell!"]
     GATHERING = \
         [
             "%X% has always been a defensive position, but in the cost of sizable farming land.",
             "We needeth to secure surrounding resources to ourselves.",
             "My lord, shall thee beest able to lent us a hand?"
         ], \
-        "Take these supplies and leave! Spare our women and children!"
+        ["We will defend what's left of ours!"]
     REGENCY = \
         ["%X% re. "], \
-        "Thee'll get squandered like a bug thou art, traitor."
+        ["Thee'll get squandered like a bug thou art, traitor."]
     TRIBAL_FEUD = \
         [
             "There hast always been hostle relation between the warchief in this region. ",
             "Destroy other tribes in this province, my lord,",
             "and thee shall earn our respect."
         ], \
-        "Barbarians! Thou art just like the rest of them!"
+        ["Barbarians! Thou art just like the rest of them!"]

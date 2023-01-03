@@ -216,7 +216,7 @@ class BuildingInfo(InfoDatasetBase):
     TENT_E = 1101, 83, 1466, 16230, False, 1
     TOWER_OF_LONDON = 1368, 37, 1492, 16182, False, 6
     TOWN_CENTER_AGE1 = 109, 28, 1408, 5164, False, 5
-    TOWN_CENTER_AGE2 = 71, 28, 1431, 5164, False, 5
+    TOWN_CENTER_AGE2 = 71, 28, 1431, 5164, False, 20
     TOWN_CENTER_AGE3 = 141, 28, 1432, 5164, False, 5
     TOWN_CENTER_AGE4 = 142, 28, 1433, 5164, False, 5
     TOWN_CENTER_AGE1_MAIN = 618, 28, -1, 5164, False, 5

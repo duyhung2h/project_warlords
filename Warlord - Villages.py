@@ -33,12 +33,16 @@ source_trigger_manager.triggers = RebuildingTriggers.rebuild_trigger(self="",
                                                                      identification_name=identification_name)
 # start adding triggers
 triggerStart = source_trigger_manager.add_trigger("9===" + identification_name + " Start===")
-triggerSeparator = source_trigger_manager.add_trigger("----UnitInsideHero---------------")
 
 '''
 Request texts when you get near a village
 '''
+
+nearVilTriggerlist = []
+vilID = -1
 for village in Villages.get_villages():
+    nearVilTriggerlist.append([])
+    vilID = vilID + 1
     req_texts = [village.villageName + ": "]
     for req_text in VillageInfo[village.typeOfMission].REQ_TEXT:
         req_texts.append(re.sub('%X%', village.villageName, req_text))
@@ -50,11 +54,13 @@ for village in Villages.get_villages():
             looping=False,
             name="P" + str(playerId) + "UnitNearVillage"
         )
+        nearVilTriggerlist[vilID].append(trigg_unit_near_village.trigger_id)
         trigg_unit_outof_village = source_trigger_manager.add_trigger(
             enabled=False,
             looping=False,
             name="P" + str(playerId) + "UnitOutOfVillage"
         )
+        nearVilTriggerlist[vilID].append(trigg_unit_outof_village.trigger_id)
         # UnitNearVillage
         trigg_unit_near_village.new_condition.objects_in_area(
             quantity=1,
@@ -167,7 +173,6 @@ for village in Villages.get_villages():
                 object_list_unit_id=BuildingInfo.HARBOR.ID
             )
 
-
 '''
 modify appease | defy icon inside TC
 '''
@@ -256,6 +261,155 @@ for playerId in range(1, 9, 1):
         object_attributes=ObjectAttribute.TRAIN_TIME,
         quantity=0
     )
+    trigg_modify_TC_icon.new_effect.modify_attribute(
+        source_player=playerId,
+        object_list_unit_id=UnitInfo.COW_B.ID,
+        operation=Operation.SET,
+        object_attributes=ObjectAttribute.POPULATION,
+        quantity=0
+    )
+    trigg_modify_TC_icon.new_effect.modify_attribute(
+        source_player=playerId,
+        object_list_unit_id=UnitInfo.COW_A.ID,
+        operation=Operation.SET,
+        object_attributes=ObjectAttribute.POPULATION,
+        quantity=0
+    )
+
+'''
+Now we teleport the cow away to notice defy/appease from each village
+'''
+print("===TeleVillageDefyAppease=============================================")
+vilID = -1
+for village in Villages.get_villages():
+    vilID = vilID + 1
+    threat_texts = [village.villageName + ": "]
+    for threat_text in VillageInfo[village.typeOfMission].THREAT_TEXT:
+        threat_texts.append(re.sub('%X%', village.villageName, threat_text))
+        print(threat_texts)
+    for playerId in range(1, 9, 1):
+        '''
+        Appease
+        '''
+        trigg_near_village_appease_check = source_trigger_manager.add_trigger(
+            name="P" + str(playerId) + "_VilAppeaseCheck_" + village.villageName,
+            looping=True,
+            enabled=True)
+        trigg_near_village_appease_check.new_condition.objects_in_area(
+            quantity=1,
+            source_player=playerId,
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3],
+            object_state=ObjectState.ALIVE,
+            object_list=UnitInfo.COW_A.ID
+        )
+        trigg_near_village_appease_check.new_effect.remove_object(
+            source_player=playerId,
+            object_list_unit_id=UnitInfo.COW_A.ID,
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3],
+            object_state=ObjectState.ALIVE,
+        )
+        # Activate the appeasing mission
+        # trigg_near_village_appease_check.new_effect.activate_trigger(
+        #     trigger_id=0
+        # )
+        # Change into a different building
+        trigg_near_village_appease_check.new_effect.replace_object(
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3],
+            source_player=playerId,
+            target_player=playerId,
+            object_list_unit_id=BuildingInfo.HARBOR.ID,
+            object_list_unit_id_2=BuildingInfo.TOWN_CENTER_AGE2.ID
+        )
+        '''
+        Defy
+        '''
+        trigg_near_village_defy_check = source_trigger_manager.add_trigger(
+            name="P" + str(playerId) + "_VilDefyCheck_" + village.villageName,
+            looping=True,
+            enabled=True
+        )
+        trigg_near_village_defy_check.new_condition.objects_in_area(
+            quantity=1,
+            source_player=playerId,
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3],
+            object_state=ObjectState.ALIVE,
+            object_list=UnitInfo.COW_B.ID
+        )
+        trigg_near_village_defy_check.new_effect.remove_object(
+            source_player=playerId,
+            object_list_unit_id=UnitInfo.COW_B.ID,
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3],
+            object_state=ObjectState.ALIVE,
+        )
+        # Activate the appeasing mission
+        # trigg_near_village_defy_check.new_effect.activate_trigger(
+        #     trigger_id=0
+        # )
+        # Change into a different building
+        trigg_near_village_defy_check.new_effect.replace_object(
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3],
+            source_player=playerId,
+            target_player=0,
+            object_list_unit_id=BuildingInfo.HARBOR.ID,
+            object_list_unit_id_2=BuildingInfo.TOWN_CENTER_AGE2.ID
+        )
+        for quantity in range(1, 20, 1):
+            trigg_near_village_defy_check.new_effect.create_garrisoned_object(
+                selected_object_ids=village.coreTC,
+                source_player=0,
+                object_list_unit_id_2=158
+            )
+        trigg_near_village_defy_check.new_effect.replace_object(
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3],
+            source_player=0,
+            target_player=0,
+            object_list_unit_id=BuildingInfo.TOWN_CENTER_AGE2.ID,
+            object_list_unit_id_2=BuildingInfo.HARBOR.ID
+        )
+        trigg_near_village_defy_check.new_effect.kill_object(
+            selected_object_ids=village.coreTC
+        )
+        trigg_near_village_defy_check.new_effect.enable_unit_targeting(
+            source_player=0,
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3],
+        )
+        for threat_text in threat_texts:
+            trigg_near_village_defy_check.new_effect.send_chat(
+                source_player=playerId,
+                message="<RED>" + threat_text
+            )
+        # Disable first interaction (both appease and defy)
+        for nearVilTriggerId in nearVilTriggerlist[vilID]:
+            trigg_near_village_appease_check.new_effect.deactivate_trigger(
+                trigger_id=nearVilTriggerId
+            )
+            trigg_near_village_defy_check.new_effect.deactivate_trigger(
+                trigger_id=nearVilTriggerId
+            )
 
 triggerSeparator = source_trigger_manager.add_trigger("----defyVillage---------------")
 

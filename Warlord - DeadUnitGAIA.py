@@ -9,7 +9,7 @@ from model.buildings import BuildingInfo
 scenario_folder = "C:/Users/Admin/Games/Age of Empires 2 DE/76561198148041091/resources/_common/scenario/"
 
 # Source scenario to work with
-scenario_name = "12warlords 0v1v9"
+scenario_name = "12warlords 0v1v10"
 input_path = scenario_folder + scenario_name + ".aoe2scenario"
 output_path = scenario_folder + scenario_name + " modify GAIA" + ".aoe2scenario"
 
@@ -64,6 +64,11 @@ create_garri_trigg = source_trigger_manager.add_trigger("GAIA_GAR_CREATE")
 create_garri_trigg.new_condition.timer(timer=11)
 for unit in P1to6_units:
     for buildingInfo in BuildingInfo.non_gaia():
+        # make building untargetable
+        if unit.unit_const == buildingInfo.ID:
+            create_garri_trigg.new_effect.disable_unit_targeting(
+                selected_object_ids=unit.reference_id
+            )
         if buildingInfo.GARRISON_CAP > 0 and unit.unit_const == buildingInfo.ID:
             # print(unit)
             # GAIA_building.append(unit.reference_id)
@@ -79,7 +84,7 @@ for unit in P1to6_units:
 '''
 Now we teleport the sheep away to count GAIA razing for each players
 '''
-print("===TeleportAndCountRazing" + str(playerId) + "=============================================")
+print("===TeleportAndCountRazing=============================================")
 for playerId in range(1, 9, 1):
     # Add triggers for garrison CAP
     sheep_tele_trigg = source_trigger_manager.add_trigger(name="P" + str(playerId) + "_TeleSheep", looping=True,
