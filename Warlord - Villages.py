@@ -13,7 +13,7 @@ from model.village_enum import VillageInfo
 scenario_folder = "C:/Users/Admin/Games/Age of Empires 2 DE/76561198148041091/resources/_common/scenario/"
 
 # Source scenario to work with
-scenario_name = "12warlords 0v1v10"
+scenario_name = "12warlords 0v1v26"
 input_path = scenario_folder + scenario_name + ".aoe2scenario"
 output_path = scenario_folder + scenario_name + " Adding Villages" + ".aoe2scenario"
 
@@ -37,7 +37,6 @@ triggerStart = source_trigger_manager.add_trigger("9===" + identification_name +
 '''
 Request texts when you get near a village
 '''
-
 nearVilTriggerlist = []
 vilID = -1
 for village in Villages.get_villages():
@@ -277,6 +276,38 @@ for playerId in range(1, 9, 1):
     )
 
 '''
+modify Player tp be hunnic or not
+'''
+triggerSeparator = source_trigger_manager.add_trigger("----modifyPlayerHunic---------------")
+for playerId in range(1, 9, 1):
+    # Hunnic (require no house if you have no village)
+    trigg_modify_hunnic = source_trigger_manager.add_trigger(
+        name="P" + str(playerId) + "_HunModify"
+    )
+    trigg_modify_hunnic.new_effect.research_technology(
+        source_player=playerId,
+        technology=658,
+        force_research_technology=1
+    )
+
+'''
+modify TC main
+'''
+Main_TC_Unit = BuildingInfo.TOWN_CENTER_AGE1.ID
+triggerSeparator = source_trigger_manager.add_trigger("----modifyTCmain---------------")
+for playerId in range(1, 9, 1):
+    # modify TC main to train vil
+    trigg_modify_TC_main = source_trigger_manager.add_trigger(
+        name="P" + str(playerId) + "_modifyTCmain"
+    )
+    trigg_modify_TC_main.new_effect.change_train_location(
+        object_list_unit_id=UnitInfo.VILLAGER_MALE.ID,
+        object_list_unit_id_2=Main_TC_Unit,
+        button_location=1,
+        source_player=playerId
+    )
+
+'''
 Now we teleport the cow away to notice defy/appease from each village
 '''
 print("===TeleVillageDefyAppease=============================================")
@@ -295,6 +326,14 @@ for village in Villages.get_villages():
             name="P" + str(playerId) + "_VilAppeaseCheck_" + village.villageName,
             looping=True,
             enabled=True)
+        trigg_player_village_destroyed = source_trigger_manager.add_trigger(
+            name="P" + str(playerId) + "_playerVillageDestroyed_" + village.villageName,
+            looping=False,
+            enabled=False)
+        trigg_player_village_rename_when_born = source_trigger_manager.add_trigger(
+            name="P" + str(playerId) + "_playerVillageRenameWhenBorn_" + village.villageName,
+            looping=False,
+            enabled=False)
         trigg_near_village_appease_check.new_condition.objects_in_area(
             quantity=1,
             source_player=playerId,
@@ -315,10 +354,30 @@ for village in Villages.get_villages():
             object_state=ObjectState.ALIVE,
         )
         # Activate the appeasing mission
-        # trigg_near_village_appease_check.new_effect.activate_trigger(
-        #     trigger_id=0
-        # )
+        trigg_near_village_appease_check.new_effect.activate_trigger(
+            trigger_id=trigg_player_village_destroyed.trigger_id
+        )
+        # Activate the appeasing mission
+        trigg_near_village_appease_check.new_effect.activate_trigger(
+            trigger_id=trigg_player_village_rename_when_born.trigger_id
+        )
         # Change into a different building
+        # trigg_near_village_appease_check.new_effect.replace_object(
+        #     area_x1=village.locationXY[0],
+        #     area_x2=village.locationXY[1],
+        #     area_y1=village.locationXY[2],
+        #     area_y2=village.locationXY[3],
+        #     source_player=playerId,
+        #     target_player=playerId,
+        #     object_list_unit_id=BuildingInfo.HARBOR.ID,
+        #     object_list_unit_id_2=Main_TC_Unit
+        # )
+        trigg_near_village_appease_check.new_effect.create_object(
+            object_list_unit_id=600,
+            source_player=playerId,
+            location_x=village.TClocation[0] - 1,
+            location_y=village.TClocation[1]
+        )
         trigg_near_village_appease_check.new_effect.replace_object(
             area_x1=village.locationXY[0],
             area_x2=village.locationXY[1],
@@ -326,8 +385,19 @@ for village in Villages.get_villages():
             area_y2=village.locationXY[3],
             source_player=playerId,
             target_player=playerId,
-            object_list_unit_id=BuildingInfo.HARBOR.ID,
-            object_list_unit_id_2=BuildingInfo.TOWN_CENTER_AGE2.ID
+            object_list_unit_id=600,
+            object_list_unit_id_2=Main_TC_Unit
+        )
+        # Disable select core harbor
+        trigg_near_village_appease_check.new_effect.disable_object_selection(
+            selected_object_ids=village.coreTC,
+            source_player=playerId
+        )
+        trigg_near_village_appease_check.new_effect.change_ownership(
+            source_player=playerId,
+            target_player=0,
+            selected_object_ids=village.coreTC,
+            flash_object=1
         )
         '''
         Defy
@@ -369,7 +439,7 @@ for village in Villages.get_villages():
             source_player=playerId,
             target_player=0,
             object_list_unit_id=BuildingInfo.HARBOR.ID,
-            object_list_unit_id_2=BuildingInfo.TOWN_CENTER_AGE2.ID
+            object_list_unit_id_2=Main_TC_Unit
         )
         for quantity in range(1, 20, 1):
             trigg_near_village_defy_check.new_effect.create_garrisoned_object(
@@ -384,7 +454,7 @@ for village in Villages.get_villages():
             area_y2=village.locationXY[3],
             source_player=0,
             target_player=0,
-            object_list_unit_id=BuildingInfo.TOWN_CENTER_AGE2.ID,
+            object_list_unit_id=Main_TC_Unit,
             object_list_unit_id_2=BuildingInfo.HARBOR.ID
         )
         trigg_near_village_defy_check.new_effect.kill_object(
@@ -410,8 +480,83 @@ for village in Villages.get_villages():
             trigg_near_village_defy_check.new_effect.deactivate_trigger(
                 trigger_id=nearVilTriggerId
             )
+        '''
+        When a player village got destroyed
+        '''
+        trigg_player_village_destroyed.new_condition.own_fewer_objects(
+            quantity=0,
+            object_list=Main_TC_Unit,
+            source_player=playerId,
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3],
+        )
+        trigg_player_village_destroyed.new_condition.timer(timer=2)
+        trigg_player_village_destroyed.new_effect.display_instructions(
+            source_player=playerId,
+            object_list_unit_id=Main_TC_Unit,
+            message="Player " + str(
+                playerId) + " Province of " + village.villageName + " has been overtaken! Other players are free to contest over the territory!",
+            sound_name="WONDER_DESTROYED",
+            display_time=30,
+            instruction_panel_position=2,
+        )
+        trigg_player_village_destroyed.new_effect.enable_object_selection(
+            selected_object_ids=village.coreTC,
+            source_player=0,
+        )
+        trigg_player_village_destroyed.new_effect.change_ownership(
+            source_player=playerId,
+            target_player=0,
+            object_type=ObjectType.BUILDING,
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3]
+        )
+        '''change TC name when born'''
+        trigg_player_village_rename_when_born.new_condition.timer(
+            timer=2
+        )
+        trigg_player_village_rename_when_born.new_effect.change_object_name(
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3],
+            source_player=playerId,
+            object_list_unit_id=BuildingInfo.TOWN_CENTER_AGE1.ID,
+            message=village.villageName
+        )
+        trigg_player_village_rename_when_born.new_effect.change_object_name(
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3],
+            source_player=playerId,
+            object_list_unit_id=BuildingInfo.TOWN_CENTER_AGE2.ID,
+            message=village.villageName
+        )
+        trigg_player_village_rename_when_born.new_effect.change_object_name(
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3],
+            source_player=playerId,
+            object_list_unit_id=BuildingInfo.TOWN_CENTER_AGE3.ID,
+            message=village.villageName
+        )
+        trigg_player_village_rename_when_born.new_effect.change_object_name(
+            area_x1=village.locationXY[0],
+            area_x2=village.locationXY[1],
+            area_y1=village.locationXY[2],
+            area_y2=village.locationXY[3],
+            source_player=playerId,
+            object_list_unit_id=BuildingInfo.TOWN_CENTER_AGE4.ID,
+            message=village.villageName
+        )
 
-triggerSeparator = source_trigger_manager.add_trigger("----defyVillage---------------")
+triggerSeparator = source_trigger_manager.add_trigger("--ATTRITION IN WINTER---------------")
 
 triggerEnd = source_trigger_manager.add_trigger("9===" + identification_name + " End===")
 

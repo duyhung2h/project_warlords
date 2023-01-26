@@ -18,9 +18,9 @@ class RebuildingTriggers:
         print(triggerStart, triggerEnd)
         print(source_trigger_manager.triggers[triggerDisplayList[triggerStart]])
         print(source_trigger_manager.triggers[triggerDisplayList[triggerEnd]])
-
-        triggerDisplayList = triggerDisplayList[:triggerStart] \
-                             + triggerDisplayList[triggerEnd + 1:]
+        if triggerStart != -1 and triggerEnd != -1:
+            triggerDisplayList = triggerDisplayList[:triggerStart] \
+                                 + triggerDisplayList[triggerEnd + 1:]
         print("=======================================")
         print(triggerDisplayList)
 

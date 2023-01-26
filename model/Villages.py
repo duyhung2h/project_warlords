@@ -20,10 +20,11 @@ class Villages:
 
     def get_villages():
         return [
-            Villages('Tuyên Quang', [97, 131, 85, 118], 'ARMS_RACE', [117, 105], 28610),
+            Villages('Đại La', [82, 104, 147, 174], 'REGENCY', [85, 151], 17204),
+            Villages('Tam Đái', [98, 132, 67, 115], 'ARMS_RACE', [125, 89], 28610),
             Villages('Bắc Kạn', [160, 189, 126, 153], 'GATHERING', [172, 141], 21166),
-            Villages('Đại La', [82, 104, 147, 174], 'REGENCY', [97, 155], 17204),
-            Villages('Hoa Lư 1', [0, 0, 0, 0], 'TRIBAL_FEUD', [0, 0], 1),
+            Villages('Hoa Lư', [47, 74, 189, 227], 'TRIBAL_FEUD', [66, 207], 30266),
+            Villages('Thái Nguyên', [132, 159, 95, 139], 'ARMS_RACE', [147, 131], 32979),
         ]
 
     '''

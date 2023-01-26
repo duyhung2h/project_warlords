@@ -1,10 +1,11 @@
 from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
+from model.Villages import Villages
 
 # File & Folder setup
 scenario_folder = "C:/Users/Admin/Games/Age of Empires 2 DE/76561198148041091/resources/_common/scenario/"
 
 # Source scenario to work with
-scenario_name = "12warlords 0v1v9"
+scenario_name = "12warlords 0v1v25"
 input_path = scenario_folder + scenario_name + ".aoe2scenario"
 
 # declare scenario class
@@ -52,31 +53,48 @@ for triggerId in range(0, len(source_trigger_manager.triggers), 1):
 
 # working with triggers
 testTriggers = source_trigger_manager.triggers[test_position_start:test_position_end]
-try:
-    print(testTriggers[0].trigger_id)
-    print("location Tuyên Quang [x1 = " + str(testTriggers[0].conditions[0].area_x1) + ", x2 = " + str(
-        testTriggers[0].conditions[0].area_x2) + ", y1 = " + str(
-        testTriggers[0].conditions[0].area_y1) + ", y2 = " + str(testTriggers[0].conditions[0].area_y2) + "]")
-    print("map size: " + str(testTriggers[0].conditions[1].area_x2))
-    print("location Bắc Kạn [x1 = " + str(testTriggers[0].conditions[2].area_x1) + ", x2 = " + str(
-        testTriggers[0].conditions[2].area_x2) + ", y1 = " + str(
-        testTriggers[0].conditions[2].area_y1) + ", y2 = " + str(testTriggers[0].conditions[2].area_y2) + "]")
-    print("location Đại La [x1 = " + str(testTriggers[0].conditions[3].area_x1) + ", x2 = " + str(
-        testTriggers[0].conditions[3].area_x2) + ", y1 = " + str(
-        testTriggers[0].conditions[3].area_y1) + ", y2 = " + str(testTriggers[0].conditions[3].area_y2) + "]")
-    print("teleSheep location: [x=" + str(testTriggers[0].effects[0].location_x) + ", y=" + str(
-        testTriggers[0].effects[0].location_y) + "]")
-    print("------------CheckTCLocation--------------")
-    print("TC Dai La location: [x=" + str(testTriggers[1].effects[0].location_x) + ", y=" + str(
-        testTriggers[1].effects[0].location_y) + "]")
-    print("TC Tuyên Quang location: [x=" + str(testTriggers[1].effects[1].location_x) + ", y=" + str(
-        testTriggers[1].effects[1].location_y) + "]")
-    print("TC Bắc Kạn location: [x=" + str(testTriggers[1].effects[2].location_x) + ", y=" + str(
-        testTriggers[1].effects[2].location_y) + "]")
-    print("TC Dai La Coreunit: " + str(testTriggers[1].effects[0].selected_object_ids))
-    print("TC Tuyên Quang Coreunit: " + str(testTriggers[1].effects[1].selected_object_ids))
-    print("TC Bắc Kạn Coreunit: " + str(testTriggers[1].effects[2].selected_object_ids))
+villages = Villages.get_villages()
+
+# try:
+print(testTriggers[0].trigger_id)
+print("map size: " + str(testTriggers[0].conditions[1].area_x2))
+print("teleSheep location: [x=" + str(testTriggers[0].effects[0].location_x) + ", y=" + str(
+    testTriggers[0].effects[0].location_y) + "]")
+print("------------Coreunit--------------")
+print("TC Dai La Coreunit: " + str(testTriggers[1].effects[0].selected_object_ids))
+print("TC Tam Đái Coreunit: " + str(testTriggers[1].effects[1].selected_object_ids))
+print("TC Bắc Kạn Coreunit: " + str(testTriggers[1].effects[2].selected_object_ids))
+print("TC Hoa Lư Coreunit: " + str(testTriggers[1].effects[3].selected_object_ids))
+print("TC Thái Nguyên Coreunit: " + str(testTriggers[1].effects[4].selected_object_ids))
+coreunit_DL = unit_manager.filter_units_by_reference_id(unit_reference_ids=[testTriggers[1].effects[0].selected_object_ids[0]])[0]
+coreunit_TD = unit_manager.filter_units_by_reference_id(unit_reference_ids=[testTriggers[1].effects[1].selected_object_ids[0]])[0]
+coreunit_BK = unit_manager.filter_units_by_reference_id(unit_reference_ids=[testTriggers[1].effects[2].selected_object_ids[0]])[0]
+coreunit_HL = unit_manager.filter_units_by_reference_id(unit_reference_ids=[testTriggers[1].effects[3].selected_object_ids[0]])[0]
+coreunit_TN = unit_manager.filter_units_by_reference_id(unit_reference_ids=[testTriggers[1].effects[4].selected_object_ids[0]])[0]
+# print(coreunit_TD)
+print("------------village area--------------")
+print("area Đại La [x1 = " + str(testTriggers[0].conditions[3].area_x1) + ", x2 = " + str(
+    testTriggers[0].conditions[3].area_x2) + ", y1 = " + str(
+    testTriggers[0].conditions[3].area_y1) + ", y2 = " + str(testTriggers[0].conditions[3].area_y2) + "]")
+print("area Tam Đái [x1 = " + str(testTriggers[1].effects[1].area_x1) + ", x2 = " + str(
+    testTriggers[1].effects[1].area_x2) + ", y1 = " + str(
+    testTriggers[1].effects[1].area_y1) + ", y2 = " + str(testTriggers[1].effects[1].area_y2) + "]")
+print("area Bắc Kạn [x1 = " + str(testTriggers[0].conditions[2].area_x1) + ", x2 = " + str(
+    testTriggers[0].conditions[2].area_x2) + ", y1 = " + str(
+    testTriggers[0].conditions[2].area_y1) + ", y2 = " + str(testTriggers[0].conditions[2].area_y2) + "]")
+print("area Hoa Lư [x1 = " + str(testTriggers[1].effects[3].area_x1) + ", x2 = " + str(
+    testTriggers[1].effects[3].area_x2) + ", y1 = " + str(
+    testTriggers[1].effects[3].area_y1) + ", y2 = " + str(testTriggers[1].effects[3].area_y2) + "]")
+print("area Thái Nguyên [x1 = " + str(testTriggers[1].effects[4].area_x1) + ", x2 = " + str(
+    testTriggers[1].effects[4].area_x2) + ", y1 = " + str(
+    testTriggers[1].effects[4].area_y1) + ", y2 = " + str(testTriggers[1].effects[4].area_y2) + "]")
+print("------------CheckTCLocation--------------")
+print("TC Dai La location: [x=" + str(coreunit_DL.x) + ", y=" + str(coreunit_DL.y) + "]")
+print("TC Tam Đái location: [x=" + str(coreunit_TD.x) + ", y=" + str(coreunit_TD.y) + "]")
+print("TC Bắc Kạn location: [x=" + str(coreunit_BK.x) + ", y=" + str(coreunit_BK.y) + "]")
+print("TC Hoa Lư location: [x=" + str(coreunit_HL.x) + ", y=" + str(coreunit_HL.y) + "]")
+print("TC Thái Nguyên location: [x=" + str(coreunit_TN.x) + ", y=" + str(coreunit_TN.y) + "]")
 
 
-except:
-    print("This is not the map!")
+# except Exception as ex:
+#     print(ex)
