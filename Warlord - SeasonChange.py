@@ -1,12 +1,13 @@
 import random
 
-from AoE2ScenarioParser.datasets.trigger_lists import ColorMood
+from AoE2ScenarioParser.datasets.trigger_lists import ColorMood, ObjectClass, ObjectState
 from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
 
 from functions.RebuildingTriggers import RebuildingTriggers
 from functions.indexing_file.indexing_file import IndexingFile
-
 # File & Folder setup
+from model.seasonal_trees import SeasonalTrees
+
 scenario_folder = "C:/Users/Admin/Games/Age of Empires 2 DE/76561198148041091/resources/_common/scenario/"
 
 # Source scenario to work with
@@ -38,11 +39,13 @@ print("map_size: " + str(map_size))
 indexing_file = IndexingFile()
 snow_tiles_log_file = open(indexing_file.uniquify(path="logs/snow_tiles_log/snow_tiles_log.txt"), "w")
 write_by_log_file = False
+unit_manager = source_scenario.unit_manager
 
 ''''''
 
 # get all the terrains tiles (compiled in a list) in the map
 originalTerrains = source_scenario.map_manager.terrain
+map_manager = source_scenario.map_manager
 
 '''
 create triggers that changes season manually (create ice patches and replace trees)
@@ -51,6 +54,9 @@ trigg_winter = source_trigger_manager.add_trigger(
     name="ModifySeasonWinter",
     enabled=True,
     looping=False
+)
+trigg_winter.new_condition.timer(
+    timer=10,
 )
 trigg_winter.new_effect.display_instructions(
     source_player=0,
@@ -122,9 +128,9 @@ plot (x-0.4)^(1 - (<ele>-2)/5))
 '''
 for terrain in originalTerrains:
     randomChance = ((random.random() - 0.4) ** (1 - (terrain.elevation - 2) / 5)).real
-    print("X=" + str(terrain.x) + " Y=" + str(terrain.y) + " Elevation=" + str(
-        terrain.elevation) + " Random chance=" + str(
-        randomChance))
+    # print("X=" + str(terrain.x) + " Y=" + str(terrain.y) + " Elevation=" + str(
+    #     terrain.elevation) + " Random chance=" + str(
+    #     randomChance))
     if float(randomChance) > float(0.6):  # chances depends on elevation bro
         print("PASS!")
         for allowed_terrain in allowed_terrains:
@@ -140,7 +146,9 @@ for terrain in originalTerrains:
                     )
                     snow_tiles_log_file.write(
                         "at x=" + str(terrain.x) + "; y=" + str(terrain.y) + ";facet=" + str(random_ice_facet) + "\n")
-                    # continue
+                    if terrain.elevation < 6:
+                        continue
+                    random_ice_facet = random.choice(random_ice_facets)
                 if random.random() > randomChance:  # 1/6
                     trigg_winter_snow_transition_2.new_effect.create_object(
                         object_list_unit_id=728,  # Ice, navigable
@@ -151,7 +159,9 @@ for terrain in originalTerrains:
                     )
                     snow_tiles_log_file.write(
                         "at x=" + str(terrain.x) + "; y=" + str(terrain.y) + ";facet=" + str(random_ice_facet) + "\n")
-                    # continue
+                    if terrain.elevation < 6:
+                        continue
+                    random_ice_facet = random.choice(random_ice_facets)
                 if random.random() > randomChance:  # 1/6
                     trigg_winter_snow_transition_3.new_effect.create_object(
                         object_list_unit_id=728,  # Ice, navigable
@@ -162,7 +172,9 @@ for terrain in originalTerrains:
                     )
                     snow_tiles_log_file.write(
                         "at x=" + str(terrain.x) + "; y=" + str(terrain.y) + ";facet=" + str(random_ice_facet) + "\n")
-                    # continue
+                    if terrain.elevation < 6:
+                        continue
+                    random_ice_facet = random.choice(random_ice_facets)
                 if random.random() > randomChance:  # 1/6
                     trigg_winter_snow_transition_4.new_effect.create_object(
                         object_list_unit_id=728,  # Ice, navigable
@@ -173,7 +185,9 @@ for terrain in originalTerrains:
                     )
                     snow_tiles_log_file.write(
                         "at x=" + str(terrain.x) + "; y=" + str(terrain.y) + ";facet=" + str(random_ice_facet) + "\n")
-                    # continue
+                    if terrain.elevation < 6:
+                        continue
+                    random_ice_facet = random.choice(random_ice_facets)
                 if random.random() > randomChance:  # 1/6
                     trigg_winter_snow_transition_5.new_effect.create_object(
                         object_list_unit_id=728,  # Ice, navigable
@@ -184,7 +198,9 @@ for terrain in originalTerrains:
                     )
                     snow_tiles_log_file.writelines(
                         "at x=" + str(terrain.x) + "; y=" + str(terrain.y) + ";facet=" + str(random_ice_facet) + "\n")
-                    # continue
+                    if terrain.elevation < 6:
+                        continue
+                    random_ice_facet = random.choice(random_ice_facets)
                 if random.random() > randomChance:  # 1/6
                     trigg_winter_snow_transition_6.new_effect.create_object(
                         object_list_unit_id=728,  # Ice, navigable
@@ -195,13 +211,77 @@ for terrain in originalTerrains:
                     )
                     snow_tiles_log_file.write(
                         "at x=" + str(terrain.x) + "; y=" + str(terrain.y) + ";facet=" + str(random_ice_facet) + "\n")
-                    # continue
+                    if terrain.elevation < 6:
+                        continue
+                    random_ice_facet = random.choice(random_ice_facets)
 trigg_winter.new_effect.activate_trigger(trigger_id=trigg_winter_snow_transition_1.trigger_id)
 trigg_winter_snow_transition_1.new_effect.activate_trigger(trigger_id=trigg_winter_snow_transition_2.trigger_id)
 trigg_winter_snow_transition_2.new_effect.activate_trigger(trigger_id=trigg_winter_snow_transition_3.trigger_id)
 trigg_winter_snow_transition_3.new_effect.activate_trigger(trigger_id=trigg_winter_snow_transition_4.trigger_id)
 trigg_winter_snow_transition_4.new_effect.activate_trigger(trigger_id=trigg_winter_snow_transition_5.trigger_id)
 trigg_winter_snow_transition_5.new_effect.activate_trigger(trigger_id=trigg_winter_snow_transition_6.trigger_id)
+
+
+'''
+Transform trees to correct seasonal variant
+'''
+print("Transform trees to correct seasonal variant")
+trees_in_map_list = []
+seasonal_trees_list = SeasonalTrees.get_seasonal_trees()
+for unit in unit_manager.get_player_units(player=0):
+    for seasonal_tree in seasonal_trees_list:
+        if unit.rotation == seasonal_tree.SummerVariant and (
+                unit.unit_const == 349 or unit.unit_const == 411):  # Oak, Oak Forest
+            tile_below_unit = map_manager.get_tile(x=int(unit.x), y=int(unit.y))
+            randomChance = ((random.random() - 0.4) ** (1 - (tile_below_unit.elevation - 2) / 5)).real
+            if float(randomChance) > float(0.40):  # chances depends on elevation bro
+                print(unit)
+                trees_in_map_list.append(unit)
+# winter change
+trigg_winter_tree_transition_disable = source_trigger_manager.add_trigger(
+    name="WinterTreeTransition_disable",
+    enabled=False,
+    looping=False
+)
+trigg_winter_snow_transition_5.new_effect.deactivate_trigger(trigger_id=trigg_winter_tree_transition_disable.trigger_id)
+for unit in trees_in_map_list:
+    trigg_winter_tree_transition = source_trigger_manager.add_trigger(
+        name="WinterTreeTransition_x=" + str(unit.x) + "y=" + str(unit.y),
+        enabled=False,
+        looping=False
+    )
+    trigg_winter.new_effect.activate_trigger(trigger_id=trigg_winter_tree_transition.trigger_id)
+    for seasonal_tree in seasonal_trees_list:
+        if unit.rotation == seasonal_tree.SummerVariant:
+            trigg_winter_tree_transition_disable.new_effect.deactivate_trigger(
+                trigg_winter_tree_transition_disable.trigger_id)
+            trigg_winter_tree_transition.new_condition.objects_in_area(
+                area_x1=int(unit.x),
+                area_x2=int(unit.x),
+                area_y1=int(unit.y),
+                area_y2=int(unit.y),
+                source_player=0,
+                quantity=1,
+                object_group=ObjectClass.TREE,
+                object_state=ObjectState.ALIVE
+            )
+            trigg_winter_tree_transition.new_effect.remove_object(
+                source_player=0,
+                area_x1=int(unit.x),
+                area_x2=int(unit.x),
+                area_y1=int(unit.y),
+                area_y2=int(unit.y),
+                object_group=ObjectClass.TREE,
+                object_state=ObjectState.ALIVE
+            )
+            trigg_winter_tree_transition.new_effect.create_object(
+                object_list_unit_id=1249,
+                source_player=0,
+                facet=int(unit.rotation),
+                location_x=int(unit.x),
+                location_y=int(unit.y),
+            )
+
 
 triggerEnd = source_trigger_manager.add_trigger("9===" + identification_name + " End===")
 
