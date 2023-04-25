@@ -5,7 +5,7 @@ from model.Villages import Villages
 scenario_folder = "C:/Users/Admin/Games/Age of Empires 2 DE/76561198148041091/resources/_common/scenario/"
 
 # Source scenario to work with
-scenario_name = "12warlords 0v1v25"
+scenario_name = "12warlords 0v1v31"
 input_path = scenario_folder + scenario_name + ".aoe2scenario"
 
 # declare scenario class
@@ -66,11 +66,15 @@ print("TC Tam Đái Coreunit: " + str(testTriggers[1].effects[1].selected_object
 print("TC Bắc Kạn Coreunit: " + str(testTriggers[1].effects[2].selected_object_ids))
 print("TC Hoa Lư Coreunit: " + str(testTriggers[1].effects[3].selected_object_ids))
 print("TC Thái Nguyên Coreunit: " + str(testTriggers[1].effects[4].selected_object_ids))
+print("TC Chu Diên Coreunit: " + str(testTriggers[1].effects[5].selected_object_ids))
+print("TC Hải Môn Coreunit: " + str(testTriggers[1].effects[6].selected_object_ids))
 coreunit_DL = unit_manager.filter_units_by_reference_id(unit_reference_ids=[testTriggers[1].effects[0].selected_object_ids[0]])[0]
 coreunit_TD = unit_manager.filter_units_by_reference_id(unit_reference_ids=[testTriggers[1].effects[1].selected_object_ids[0]])[0]
 coreunit_BK = unit_manager.filter_units_by_reference_id(unit_reference_ids=[testTriggers[1].effects[2].selected_object_ids[0]])[0]
 coreunit_HL = unit_manager.filter_units_by_reference_id(unit_reference_ids=[testTriggers[1].effects[3].selected_object_ids[0]])[0]
 coreunit_TN = unit_manager.filter_units_by_reference_id(unit_reference_ids=[testTriggers[1].effects[4].selected_object_ids[0]])[0]
+coreunit_CD = unit_manager.filter_units_by_reference_id(unit_reference_ids=[testTriggers[1].effects[5].selected_object_ids[0]])[0]
+coreunit_HM = unit_manager.filter_units_by_reference_id(unit_reference_ids=[testTriggers[1].effects[6].selected_object_ids[0]])[0]
 # print(coreunit_TD)
 print("------------village area--------------")
 print("area Đại La [x1 = " + str(testTriggers[0].conditions[3].area_x1) + ", x2 = " + str(
@@ -88,12 +92,20 @@ print("area Hoa Lư [x1 = " + str(testTriggers[1].effects[3].area_x1) + ", x2 = 
 print("area Thái Nguyên [x1 = " + str(testTriggers[1].effects[4].area_x1) + ", x2 = " + str(
     testTriggers[1].effects[4].area_x2) + ", y1 = " + str(
     testTriggers[1].effects[4].area_y1) + ", y2 = " + str(testTriggers[1].effects[4].area_y2) + "]")
+print("area Chu Diên [x1 = " + str(testTriggers[1].effects[5].area_x1) + ", x2 = " + str(
+    testTriggers[1].effects[5].area_x2) + ", y1 = " + str(
+    testTriggers[1].effects[5].area_y1) + ", y2 = " + str(testTriggers[1].effects[5].area_y2) + "]")
+print("area Hải Môn [x1 = " + str(testTriggers[1].effects[6].area_x1) + ", x2 = " + str(
+    testTriggers[1].effects[6].area_x2) + ", y1 = " + str(
+    testTriggers[1].effects[6].area_y1) + ", y2 = " + str(testTriggers[1].effects[6].area_y2) + "]")
 print("------------CheckTCLocation--------------")
 print("TC Dai La location: [x=" + str(coreunit_DL.x) + ", y=" + str(coreunit_DL.y) + "]")
 print("TC Tam Đái location: [x=" + str(coreunit_TD.x) + ", y=" + str(coreunit_TD.y) + "]")
 print("TC Bắc Kạn location: [x=" + str(coreunit_BK.x) + ", y=" + str(coreunit_BK.y) + "]")
 print("TC Hoa Lư location: [x=" + str(coreunit_HL.x) + ", y=" + str(coreunit_HL.y) + "]")
 print("TC Thái Nguyên location: [x=" + str(coreunit_TN.x) + ", y=" + str(coreunit_TN.y) + "]")
+print("TC Chu Diên location: [x=" + str(coreunit_CD.x) + ", y=" + str(coreunit_CD.y) + "]")
+print("TC Hải Môn location: [x=" + str(coreunit_HM.x) + ", y=" + str(coreunit_HM.y) + "]")
 
 
 # except Exception as ex:

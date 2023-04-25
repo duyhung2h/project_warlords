@@ -13,7 +13,7 @@ from model.village_enum import VillageInfo
 scenario_folder = "C:/Users/Admin/Games/Age of Empires 2 DE/76561198148041091/resources/_common/scenario/"
 
 # Source scenario to work with
-scenario_name = "12warlords 0v1v26"
+scenario_name = "12warlords 0v1v34"
 input_path = scenario_folder + scenario_name + ".aoe2scenario"
 output_path = scenario_folder + scenario_name + " Adding Villages" + ".aoe2scenario"
 
@@ -31,6 +31,15 @@ identification_name = "Warlord - Villages.py"
 source_trigger_manager.triggers = RebuildingTriggers.rebuild_trigger(self="",
                                                                      source_trigger_manager=source_trigger_manager,
                                                                      identification_name=identification_name)
+
+# refresh (choose whether or not you just want to delete old triggers or not)
+# refresh = True
+refresh = False
+
+if refresh:
+    source_scenario.write_to_file(output_path)
+    exit()
+
 # start adding triggers
 triggerStart = source_trigger_manager.add_trigger("9===" + identification_name + " Start===")
 

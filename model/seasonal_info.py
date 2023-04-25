@@ -20,7 +20,7 @@ class SeasonalInfo:
         if season_id == 3:
             return "Wood gather rate +33% \nFood gather rate +33%"
         if season_id == 4:
-            return "Attrition when in enemy's territory (-1 hp per 10 seconds) \nBuilding HP +33%"
+            return "Attrition when in enemy's territory (-max hp) \nBuildings are more resilient"
 
     def get_seasonal_ground_obj_facets(self, season_id):
         if season_id == 1:

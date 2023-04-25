@@ -1,12 +1,15 @@
 import random
 
-from AoE2ScenarioParser.datasets.trigger_lists import ObjectClass, ObjectState, ColorMood, Operation
+from AoE2ScenarioParser.datasets.trigger_lists import ObjectClass, ObjectState, ColorMood, Operation, ObjectType, \
+    DiplomacyState, ObjectAttribute, Attribute
 from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
 
 from functions.RebuildingTriggers import RebuildingTriggers
 from functions.indexing_file.indexing_file import IndexingFile
 # File & Folder setup
 from functions.random_chance_calculator import RandomChanceCalculator
+from model.Villages import Villages
+from model.buildings import BuildingInfo
 from model.seasonal_bushes import SeasonalBushes
 from model.seasonal_info import SeasonalInfo
 from model.seasonal_trees import SeasonalTrees
@@ -14,7 +17,7 @@ from model.seasonal_trees import SeasonalTrees
 scenario_folder = "C:/Users/Admin/Games/Age of Empires 2 DE/76561198148041091/resources/_common/scenario/"
 
 # Source scenario to work with
-scenario_name = "12warlords 0v1v29"
+scenario_name = "12warlords 0v1v33"
 input_path = scenario_folder + scenario_name + ".aoe2scenario"
 output_path = scenario_folder + scenario_name + " modify Seasons" + ".aoe2scenario"
 
@@ -32,6 +35,15 @@ identification_name = "Warlord - SeasonChange.py"
 source_trigger_manager.triggers = RebuildingTriggers.rebuild_trigger(self="",
                                                                      source_trigger_manager=source_trigger_manager,
                                                                      identification_name=identification_name)
+
+# refresh (choose whether or not you just want to delete old triggers or not)
+# refresh = True
+refresh = False
+
+if refresh:
+    source_scenario.write_to_file(output_path)
+    exit()
+
 # start adding triggers
 triggerStart = source_trigger_manager.add_trigger("9===" + identification_name + " Start===")
 
@@ -63,7 +75,7 @@ Define season transition time (in seconds)
 '''
 
 wave_transition_time = 2
-season_transition_time = 120
+season_transition_time = 60
 
 '''
 Transform trees to correct seasonal variant
@@ -137,13 +149,16 @@ for season_id in range(1, 5, 1):
     trigg_short_description.new_condition.player_defeated(source_player=0)
     trigg_short_descriptions.append(trigg_short_description)
 
+trigg_season_transition_spring = None
 for season_id in range(1, 5, 1):
     '''
     deactivate other season description
     '''
     for season_id2 in range(1, 5, 1):
-        trigg_seasons[season_id - 1].new_effect.deactivate_trigger(trigger_id=trigg_short_descriptions[season_id2 - 1].trigger_id)
-    trigg_seasons[season_id - 1].new_effect.activate_trigger(trigger_id=trigg_short_descriptions[season_id - 1].trigger_id)
+        trigg_seasons[season_id - 1].new_effect.deactivate_trigger(
+            trigger_id=trigg_short_descriptions[season_id2 - 1].trigger_id)
+    trigg_seasons[season_id - 1].new_effect.activate_trigger(
+        trigger_id=trigg_short_descriptions[season_id - 1].trigger_id)
     season_name = season_info.get_season_name(season_id=season_id)
     color_mood = 0
     if season_id == 1:
@@ -162,7 +177,7 @@ for season_id in range(1, 5, 1):
     )
     trigg_seasons[season_id - 1].new_effect.display_instructions(
         source_player=0,
-        message=season_name + " has come!",
+        message="~~~ " + season_name + " has come! ~~~",
         display_time=20,
         instruction_panel_position=1
     )
@@ -195,7 +210,7 @@ for season_id in range(1, 5, 1):
                     source_player=0,
                     object_list_unit_id=season_info.get_seasonal_ground_obj_id(season_id=season_id2),
                     area_x1=0,
-                    area_x2=map_size-1,
+                    area_x2=map_size - 1,
                     area_y1=y,
                     area_y2=y
                 )
@@ -349,7 +364,603 @@ for season_id in range(1, 5, 1):
                             location_y=int(unit.y),
                         )
         old_trigg_season_transition_y = trigg_season_transition_y
+    '''
+    If season is spring, add +1 hp per 15 secs
+    trade +50%
+    '''
+    if season_id == 1:
+        trigg_spring_heal = source_trigger_manager.add_trigger(
+            name=season_name + "SpringHeal",
+            enabled=False,
+            looping=True
+        )
+        trigg_seasons[0].new_effect.activate_trigger(trigger_id=trigg_spring_heal.trigger_id)
+        trigg_seasons[1].new_effect.deactivate_trigger(trigger_id=trigg_spring_heal.trigger_id)
 
+        trigg_spring_heal.new_condition.timer(
+            timer=15
+        )
+        for playerId in range(1, 8, 1):
+            trigg_spring_heal.new_effect.heal_object(
+                quantity=1,
+                source_player=playerId,
+                object_type=ObjectType.MILITARY
+            )
+        trigg_spring_tradebonus = source_trigger_manager.add_trigger(
+            name=season_name + "TradeBonusON",
+            enabled=False,
+            looping=False
+        )
+        trigg_seasons[0].new_effect.activate_trigger(trigger_id=trigg_spring_tradebonus.trigger_id)
+        for playerId in range(1, 8, 1):
+            # trade cart
+            trigg_spring_tradebonus.new_effect.modify_attribute(
+                source_player=playerId,
+                object_attributes=ObjectAttribute.MOVEMENT_SPEED,
+                quantity=3,
+                operation=Operation.MULTIPLY,
+                object_list_unit_id=128
+            )
+            trigg_spring_tradebonus.new_effect.modify_attribute(
+                source_player=playerId,
+                object_attributes=ObjectAttribute.MOVEMENT_SPEED,
+                quantity=2,
+                operation=Operation.DIVIDE,
+                object_list_unit_id=128
+            )
+            # trade cart (full)
+            trigg_spring_tradebonus.new_effect.modify_attribute(
+                source_player=playerId,
+                object_attributes=ObjectAttribute.MOVEMENT_SPEED,
+                quantity=3,
+                operation=Operation.MULTIPLY,
+                object_list_unit_id=204
+            )
+            trigg_spring_tradebonus.new_effect.modify_attribute(
+                source_player=playerId,
+                object_attributes=ObjectAttribute.MOVEMENT_SPEED,
+                quantity=2,
+                operation=Operation.DIVIDE,
+                object_list_unit_id=204
+            )
+            # trade cog
+            trigg_spring_tradebonus.new_effect.modify_attribute(
+                source_player=playerId,
+                object_attributes=ObjectAttribute.MOVEMENT_SPEED,
+                quantity=3,
+                operation=Operation.MULTIPLY,
+                object_list_unit_id=17
+            )
+            trigg_spring_tradebonus.new_effect.modify_attribute(
+                source_player=playerId,
+                object_attributes=ObjectAttribute.MOVEMENT_SPEED,
+                quantity=2,
+                operation=Operation.DIVIDE,
+                object_list_unit_id=17
+            )
+        trigg_spring_tradebonus_off = source_trigger_manager.add_trigger(
+            name=season_name + "TradeBonusOFF",
+            enabled=False,
+            looping=False
+        )
+        trigg_seasons[1].new_effect.activate_trigger(trigger_id=trigg_spring_tradebonus_off.trigger_id)
+        for playerId in range(1, 8, 1):
+            # trade cart
+            trigg_spring_tradebonus_off.new_effect.modify_attribute(
+                source_player=playerId,
+                object_attributes=ObjectAttribute.MOVEMENT_SPEED,
+                quantity=3,
+                operation=Operation.DIVIDE,
+                object_list_unit_id=128
+            )
+            trigg_spring_tradebonus_off.new_effect.modify_attribute(
+                source_player=playerId,
+                object_attributes=ObjectAttribute.MOVEMENT_SPEED,
+                quantity=2,
+                operation=Operation.MULTIPLY,
+                object_list_unit_id=128
+            )
+            # trade cart (full)
+            trigg_spring_tradebonus_off.new_effect.modify_attribute(
+                source_player=playerId,
+                object_attributes=ObjectAttribute.MOVEMENT_SPEED,
+                quantity=3,
+                operation=Operation.DIVIDE,
+                object_list_unit_id=204
+            )
+            trigg_spring_tradebonus_off.new_effect.modify_attribute(
+                source_player=playerId,
+                object_attributes=ObjectAttribute.MOVEMENT_SPEED,
+                quantity=2,
+                operation=Operation.MULTIPLY,
+                object_list_unit_id=204
+            )
+            # trade cog
+            trigg_spring_tradebonus_off.new_effect.modify_attribute(
+                source_player=playerId,
+                object_attributes=ObjectAttribute.MOVEMENT_SPEED,
+                quantity=3,
+                operation=Operation.DIVIDE,
+                object_list_unit_id=17
+            )
+            trigg_spring_tradebonus_off.new_effect.modify_attribute(
+                source_player=playerId,
+                object_attributes=ObjectAttribute.MOVEMENT_SPEED,
+                quantity=2,
+                operation=Operation.MULTIPLY,
+                object_list_unit_id=17
+            )
+    '''
+    If season is summer
+    
+    Gold gather rate +33%
+    Stone gather rate +33%
+    '''
+    if season_id == 1:
+        # season bonus is active
+        trigg_summer_gather_bonus_on = source_trigger_manager.add_trigger(
+            name="SummerGatherBonus_ON",
+            enabled=False,
+            looping=False
+        )
+        trigg_seasons[1].new_effect.activate_trigger(trigger_id=trigg_summer_gather_bonus_on.trigger_id)
+        for playerId in range(1, 8, 1):
+            # Gold gather rate + 33 %
+            trigg_summer_gather_bonus_on.new_effect.modify_resource(
+                operation=Operation.MULTIPLY,
+                quantity=4,
+                source_player=playerId,
+                tribute_list=Attribute.GOLD_MINING_PRODUCTIVITY
+            )
+            trigg_summer_gather_bonus_on.new_effect.modify_resource(
+                operation=Operation.DIVIDE,
+                quantity=3,
+                source_player=playerId,
+                tribute_list=Attribute.GOLD_MINING_PRODUCTIVITY
+            )
+            # Stone gather rate + 33 %
+            trigg_summer_gather_bonus_on.new_effect.modify_resource(
+                operation=Operation.MULTIPLY,
+                quantity=4,
+                source_player=playerId,
+                tribute_list=Attribute.STONE_MINING_PRODUCTIVITY
+            )
+            trigg_summer_gather_bonus_on.new_effect.modify_resource(
+                operation=Operation.DIVIDE,
+                quantity=3,
+                source_player=playerId,
+                tribute_list=Attribute.STONE_MINING_PRODUCTIVITY
+            )
+        # season bonus is inactive
+        trigg_summer_gather_bonus_off = source_trigger_manager.add_trigger(
+            name="SummerGatherBonus_OFF",
+            enabled=False,
+            looping=False
+        )
+        trigg_seasons[2].new_effect.activate_trigger(trigger_id=trigg_summer_gather_bonus_off.trigger_id)
+        for playerId in range(1, 8, 1):
+            # Gold gather rate - 33 %
+            trigg_summer_gather_bonus_off.new_effect.modify_resource(
+                operation=Operation.DIVIDE,
+                quantity=4,
+                source_player=playerId,
+                tribute_list=Attribute.GOLD_MINING_PRODUCTIVITY
+            )
+            trigg_summer_gather_bonus_off.new_effect.modify_resource(
+                operation=Operation.MULTIPLY,
+                quantity=3,
+                source_player=playerId,
+                tribute_list=Attribute.GOLD_MINING_PRODUCTIVITY
+            )
+            # Stone gather rate - 33 %
+            trigg_summer_gather_bonus_off.new_effect.modify_resource(
+                operation=Operation.DIVIDE,
+                quantity=4,
+                source_player=playerId,
+                tribute_list=Attribute.STONE_MINING_PRODUCTIVITY
+            )
+            trigg_summer_gather_bonus_off.new_effect.modify_resource(
+                operation=Operation.MULTIPLY,
+                quantity=3,
+                source_player=playerId,
+                tribute_list=Attribute.STONE_MINING_PRODUCTIVITY
+            )
+    '''
+    If season is fall
+    
+    Wood gather rate +33%
+    Food gather rate +33%
+    '''
+    if season_id == 2:
+        # season bonus is active
+        trigg_fall_gather_bonus_on = source_trigger_manager.add_trigger(
+            name="FallGatherBonus_ON",
+            enabled=False,
+            looping=False
+        )
+        trigg_seasons[2].new_effect.activate_trigger(trigger_id=trigg_fall_gather_bonus_on.trigger_id)
+        for playerId in range(1, 8, 1):
+            # Wood gather rate + 33 %
+            trigg_fall_gather_bonus_on.new_effect.modify_resource(
+                operation=Operation.MULTIPLY,
+                quantity=4,
+                source_player=playerId,
+                tribute_list=Attribute.CHOPPING_PRODUCTIVITY
+            )
+            trigg_fall_gather_bonus_on.new_effect.modify_resource(
+                operation=Operation.DIVIDE,
+                quantity=3,
+                source_player=playerId,
+                tribute_list=Attribute.CHOPPING_PRODUCTIVITY
+            )
+            # Food gather rate + 33 %
+            trigg_fall_gather_bonus_on.new_effect.modify_resource(
+                operation=Operation.MULTIPLY,
+                quantity=4,
+                source_player=playerId,
+                tribute_list=Attribute.FOOD_GATHERING_PRODUCTIVITY
+            )
+            trigg_fall_gather_bonus_on.new_effect.modify_resource(
+                operation=Operation.DIVIDE,
+                quantity=3,
+                source_player=playerId,
+                tribute_list=Attribute.FOOD_GATHERING_PRODUCTIVITY
+            )
+        # season bonus is inactive
+        trigg_fall_gather_bonus_off = source_trigger_manager.add_trigger(
+            name="FallGatherBonus_OFF",
+            enabled=False,
+            looping=False
+        )
+        trigg_seasons[3].new_effect.activate_trigger(trigger_id=trigg_fall_gather_bonus_off.trigger_id)
+        for playerId in range(1, 8, 1):
+            # Wood gather rate - 33 %
+            trigg_fall_gather_bonus_off.new_effect.modify_resource(
+                operation=Operation.DIVIDE,
+                quantity=4,
+                source_player=playerId,
+                tribute_list=Attribute.CHOPPING_PRODUCTIVITY
+            )
+            trigg_fall_gather_bonus_off.new_effect.modify_resource(
+                operation=Operation.MULTIPLY,
+                quantity=3,
+                source_player=playerId,
+                tribute_list=Attribute.CHOPPING_PRODUCTIVITY
+            )
+            # Food gather rate - 33 %
+            trigg_fall_gather_bonus_off.new_effect.modify_resource(
+                operation=Operation.DIVIDE,
+                quantity=4,
+                source_player=playerId,
+                tribute_list=Attribute.FOOD_GATHERING_PRODUCTIVITY
+            )
+            trigg_fall_gather_bonus_off.new_effect.modify_resource(
+                operation=Operation.MULTIPLY,
+                quantity=3,
+                source_player=playerId,
+                tribute_list=Attribute.FOOD_GATHERING_PRODUCTIVITY
+            )
+
+    '''
+    If season is winter, add on attrition mechanic
+    building hp + 20% (research masonry and architecture)
+    '''
+    Main_TC_Unit = BuildingInfo.TOWN_CENTER_AGE1.ID
+    if season_id == 4:
+        # building hp + 33% (research masonry and architecture)
+        trigg_winter_bonus_buildingHP = source_trigger_manager.add_trigger(
+            name="WinterBonusBldHP_ON",
+            enabled=False,
+            looping=False
+        )
+        trigg_seasons[3].new_effect.activate_trigger(trigger_id=trigg_winter_bonus_buildingHP.trigger_id)
+        for playerId in range(1, 8, 1):
+            for building in BuildingInfo:
+                if building.IS_GAIA_ONLY is False:
+                    trigg_winter_bonus_buildingHP.new_effect.modify_attribute(quantity=4, operation=Operation.MULTIPLY,
+                                                                              source_player=playerId,
+                                                                              object_list_unit_id=building.ID,
+                                                                              object_attributes=ObjectAttribute.HIT_POINTS)
+                    trigg_winter_bonus_buildingHP.new_effect.modify_attribute(quantity=3, operation=Operation.DIVIDE,
+                                                                              source_player=playerId,
+                                                                              object_list_unit_id=building.ID,
+                                                                              object_attributes=ObjectAttribute.HIT_POINTS)
+        # building hp - 33% OFF BONUS in spring
+        trigg_winter_bonus_buildingHP_OFF = source_trigger_manager.add_trigger(
+            name="WinterBonusBldHP_OFF",
+            enabled=False,
+            looping=False
+        )
+        trigg_seasons[0].new_effect.activate_trigger(trigger_id=trigg_winter_bonus_buildingHP_OFF.trigger_id)
+        for playerId in range(1, 8, 1):
+            for building in BuildingInfo:
+                if building.IS_GAIA_ONLY is False:
+                    trigg_winter_bonus_buildingHP_OFF.new_effect.modify_attribute(quantity=4,
+                                                                                  operation=Operation.DIVIDE,
+                                                                                  source_player=playerId,
+                                                                                  object_list_unit_id=building.ID,
+                                                                                  object_attributes=ObjectAttribute.HIT_POINTS)
+                    trigg_winter_bonus_buildingHP_OFF.new_effect.modify_attribute(quantity=3,
+                                                                                  operation=Operation.MULTIPLY,
+                                                                                  source_player=playerId,
+                                                                                  object_list_unit_id=building.ID,
+                                                                                  object_attributes=ObjectAttribute.HIT_POINTS)
+        # add on attrition mechanic
+        for village in Villages.get_villages():
+            for playerId in range(1, 8, 1):
+                for playerId_enemyCheck in range(1, 8, 1):
+                    if playerId != playerId_enemyCheck:
+                        trigg_winter_attrition = source_trigger_manager.add_trigger(
+                            name="WinterAttrition" + str(village.villageName) + "P" + str(
+                                playerId) + "_VS_P" + str(playerId_enemyCheck),
+                            enabled=False,
+                            looping=True
+                        )
+                        trigg_seasons[3].new_effect.activate_trigger(trigger_id=trigg_winter_attrition.trigger_id)
+                        trigg_seasons[0].new_effect.deactivate_trigger(trigger_id=trigg_winter_attrition.trigger_id)
+                        trigg_winter_attrition.new_condition.objects_in_area(
+                            quantity=1,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_state=ObjectState.ALIVE,
+                            object_type=ObjectType.MILITARY
+                        )
+                        trigg_winter_attrition.new_condition.objects_in_area(
+                            quantity=1,
+                            source_player=playerId,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_state=ObjectState.ALIVE,
+                            object_list=Main_TC_Unit
+                        )
+                        trigg_winter_attrition.new_condition.diplomacy_state(
+                            quantity=DiplomacyState.ALLY,
+                            source_player=playerId,
+                            target_player=playerId_enemyCheck,
+                            inverted=True
+                        )
+                        trigg_winter_attrition.new_effect.heal_object(
+                            quantity=10,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_type=ObjectType.MILITARY
+                        )
+                        trigg_winter_attrition.new_effect.damage_object(
+                            quantity=10,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_type=ObjectType.MILITARY
+                        )
+                        # damage cav
+                        trigg_winter_attrition.new_effect.heal_object(
+                            quantity=25,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_type=ObjectType.MILITARY,
+                            object_group=ObjectClass.CAVALRY,
+                        )
+                        trigg_winter_attrition.new_effect.damage_object(
+                            quantity=25,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_type=ObjectType.MILITARY,
+                            object_group=ObjectClass.CAVALRY,
+                        )
+                        # damage cav archer
+                        trigg_winter_attrition.new_effect.heal_object(
+                            quantity=15,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_type=ObjectType.MILITARY,
+                            object_group=ObjectClass.CAVALRY_ARCHER,
+                        )
+                        trigg_winter_attrition.new_effect.damage_object(
+                            quantity=15,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_type=ObjectType.MILITARY,
+                            object_group=ObjectClass.CAVALRY_ARCHER,
+                        )
+                        # damage ele
+                        trigg_winter_attrition.new_effect.heal_object(
+                            quantity=80,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_type=ObjectType.MILITARY,
+                            object_group=ObjectClass.WAR_ELEPHANT,
+                        )
+                        trigg_winter_attrition.new_effect.damage_object(
+                            quantity=80,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_type=ObjectType.MILITARY,
+                            object_group=ObjectClass.WAR_ELEPHANT,
+                        )
+                        # damage battle ele
+                        trigg_winter_attrition.new_effect.heal_object(
+                            quantity=75,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_list_unit_id=1132
+                        )
+                        trigg_winter_attrition.new_effect.damage_object(
+                            quantity=75,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_list_unit_id=1132
+                        )
+                        # damage elite battle ele
+                        trigg_winter_attrition.new_effect.heal_object(
+                            quantity=90,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_list_unit_id=1134
+                        )
+                        trigg_winter_attrition.new_effect.damage_object(
+                            quantity=90,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_list_unit_id=1134
+                        )
+                        # damage ele archer
+                        trigg_winter_attrition.new_effect.heal_object(
+                            quantity=69,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_list_unit_id=873
+                        )
+                        trigg_winter_attrition.new_effect.damage_object(
+                            quantity=69,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_list_unit_id=873
+                        )
+                        # damage elite ele archer
+                        trigg_winter_attrition.new_effect.heal_object(
+                            quantity=84,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_list_unit_id=875
+                        )
+                        trigg_winter_attrition.new_effect.damage_object(
+                            quantity=84,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_list_unit_id=875
+                        )
+                        # damage ele ballista
+                        trigg_winter_attrition.new_effect.heal_object(
+                            quantity=75,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_list_unit_id=1120
+                        )
+                        trigg_winter_attrition.new_effect.damage_object(
+                            quantity=75,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_list_unit_id=1120
+                        )
+                        # damage elite ele ballista
+                        trigg_winter_attrition.new_effect.heal_object(
+                            quantity=87,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_list_unit_id=1122
+                        )
+                        trigg_winter_attrition.new_effect.damage_object(
+                            quantity=87,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_list_unit_id=1122
+                        )
+                        # damage monks
+                        trigg_winter_attrition.new_effect.heal_object(
+                            quantity=9,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_group=ObjectClass.MONK,
+                        )
+                        trigg_winter_attrition.new_effect.damage_object(
+                            quantity=9,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_group=ObjectClass.MONK,
+                        )
+                        # damage monks with relic
+                        trigg_winter_attrition.new_effect.heal_object(
+                            quantity=9,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_group=ObjectClass.MONKWITH_RELIC,
+                        )
+                        trigg_winter_attrition.new_effect.damage_object(
+                            quantity=9,
+                            source_player=playerId_enemyCheck,
+                            area_x1=village.locationXY[0],
+                            area_x2=village.locationXY[1],
+                            area_y1=village.locationXY[2],
+                            area_y2=village.locationXY[3],
+                            object_group=ObjectClass.MONKWITH_RELIC,
+                        )
+                        # trigg_winter_attrition.new_effect.send_chat(
+                        #     source_player=playerId,
+                        #     message="attrition test",
+                        # )
 
 triggerEnd = source_trigger_manager.add_trigger("9===" + identification_name + " End===")
 

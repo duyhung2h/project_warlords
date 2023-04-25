@@ -25,6 +25,13 @@ class Villages:
             Villages('Bắc Kạn', [160, 189, 126, 153], 'GATHERING', [172, 141], 21166),
             Villages('Hoa Lư', [47, 74, 189, 227], 'TRIBAL_FEUD', [66, 207], 30266),
             Villages('Thái Nguyên', [132, 159, 95, 139], 'ARMS_RACE', [147, 131], 32979),
+            Villages('Chu Diên', [96, 111, 177, 195], 'GATHERING', [98, 190], 46001),
+            Villages('Hải Môn', [98, 124, 196, 216], 'ARMS_RACE', [115, 204], 55919),
+        ]
+
+    def get_tribal_feud_villages():
+        return [
+            [3, 5]
         ]
 
     '''
